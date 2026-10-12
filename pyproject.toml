@@ -1,0 +1,16 @@
+[project]
+name = "llm-product-cards"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=3.29.0",
+    "python-dotenv>=1.2.4",
+    "tqdm>=4.70.1",
+    "transformers>=5.19.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "jupyter>=1.1.1",
+]
