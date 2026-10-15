@@ -9,3 +9,6 @@ MAX_INPUT_TOKENS = 1500
 GPU_HOUR_RUB = 65.0
 API_INPUT_RUB_PER_1M = 20.0
 API_OUTPUT_RUB_PER_1M = 60.0
+
+VLLM_BASE_URL = "http://localhost:8000/v1"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
