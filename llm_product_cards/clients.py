@@ -5,7 +5,7 @@ import random
 import time
 from collections.abc import Callable, Awaitable
 from typing import Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from openai import (
     AsyncOpenAI,
@@ -26,20 +26,27 @@ RETRYABLE_STATUS = {408, 409, 429, 500, 502, 503, 504}
 
 @dataclass(frozen=True)
 class GenerationParams:
-    """Sampling settings for one experiment; vLLM-only knobs travel in extra_body."""
+    """Sampling settings for one experiment; vLLM-only knobs travel in extra_body.
+
+    top_k and repetition_penalty set to None are not sent at all: third-party
+    providers behind OpenRouter may reject unknown sampling fields with 400.
+    """
 
     temperature: float = 0.3
     top_p: float = 0.9
-    top_k: int = 50
-    repetition_penalty: float = 1.1
+    top_k: int | None = 50
+    repetition_penalty: float | None = 1.1
     max_tokens: int = 350
+    # Provider-specific request fields, e.g. OpenRouter's {"reasoning": {"exclude": True}}
+    extra: dict[str, Any] = field(default_factory=dict)
 
     def as_kwargs(self) -> dict[str, Any]:
+        knobs = {"top_k": self.top_k, "repetition_penalty": self.repetition_penalty}
         return {
             "temperature": self.temperature,
             "top_p": self.top_p,
             "max_tokens": self.max_tokens,
-            "extra_body": {"top_k": self.top_k, "repetition_penalty": self.repetition_penalty},
+            "extra_body": {**self.extra, **{k: v for k, v in knobs.items() if v is not None}},
         }
 
 

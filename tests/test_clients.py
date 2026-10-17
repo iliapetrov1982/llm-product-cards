@@ -44,6 +44,19 @@ def test_generation_params_kwargs_route_vllm_knobs_to_extra_body():
     assert "top_k" not in kwargs  # not a standard OpenAI argument
 
 
+def test_generation_params_extra_fields_are_merged_into_extra_body():
+    params = GenerationParams(top_k=None, repetition_penalty=None, extra={"reasoning": {"exclude": True}})
+    assert params.as_kwargs()["extra_body"] == {"reasoning": {"exclude": True}}
+    params = GenerationParams(extra={"reasoning": {"exclude": True}})
+    assert params.as_kwargs()["extra_body"] == {"reasoning": {"exclude": True}, "top_k": 50, "repetition_penalty": 1.1}
+
+
+def test_generation_params_none_knobs_are_not_sent():
+    kwargs = GenerationParams(top_k=None, repetition_penalty=None).as_kwargs()
+    assert kwargs["extra_body"] == {}
+    assert GenerationParams(top_k=None).as_kwargs()["extra_body"] == {"repetition_penalty": 1.1}
+
+
 @pytest.mark.parametrize("status, expected", [(429, True), (500, True), (503, True), (400, False), (401, False), (404, False)])
 def test_is_retryable_by_status(status, expected):
     assert _is_retryable(status_error(status)) is expected
