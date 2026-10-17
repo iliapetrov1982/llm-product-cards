@@ -1,0 +1,61 @@
+{
+  "run": {
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "concurrency": 32,
+    "params": {
+      "temperature": 0.3,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1,
+      "max_tokens": 350,
+      "extra": {
+        "response_format": {
+          "type": "json_object"
+        }
+      }
+    },
+    "elapsed_sec": 202.0674615329999,
+    "input_tokens": 499711,
+    "output_tokens": 95015,
+    "n": 300,
+    "avg_latency": 20.417102348260006,
+    "avg_attempts": 1.4033333333333333
+  },
+  "metrics": {
+    "valid": 259,
+    "valid_rate": 0.8633333333333333,
+    "throughput": 1.4846526883845006,
+    "time_for_300_sec": 202.0674615329999,
+    "cost_vllm_per_1000": 12.161467592263882,
+    "errors_by_reason": {
+      "missing_fields": 41
+    }
+  },
+  "api_comparison": {
+    "model": "openai/gpt-oss-20b",
+    "n": 25,
+    "valid": 25,
+    "valid_rate": 1.0,
+    "input_tokens": 24468,
+    "output_tokens": 7262,
+    "elapsed_sec": 74.66291804099455,
+    "avg_latency": 11.342176414965651,
+    "avg_attempts": 1.04,
+    "cost_per_1000": 37.0032,
+    "errors_by_reason": {},
+    "api_errors": {},
+    "params": {
+      "temperature": 0.3,
+      "top_p": 0.9,
+      "top_k": null,
+      "repetition_penalty": null,
+      "max_tokens": 350,
+      "extra": {
+        "reasoning": {
+          "exclude": true,
+          "effort": "low"
+        }
+      }
+    }
+  }
+}
