@@ -62,6 +62,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-tokens", type=int, default=defaults.max_tokens, help="answer length cap in tokens"
     )
+    parser.add_argument(
+        "--json-mode", action=argparse.BooleanOptionalAction, default=True,
+        help="ask the server for a JSON object (response_format=json_object); "
+             "--no-json-mode relies on the prompt alone"
+    )
 
     return parser.parse_args()
 
@@ -78,6 +83,7 @@ async def main(args: argparse.Namespace) -> None:
         top_k=args.top_k,
         repetition_penalty=args.repetition_penalty,
         max_tokens=args.max_tokens,
+        extra={"response_format": {"type": "json_object"}} if args.json_mode else {},
     )
     client = make_client(args.base_url, api_key="EMPTY")
     request_fn = make_request_fn(client, args.model, params)
@@ -98,7 +104,7 @@ async def main(args: argparse.Namespace) -> None:
         "n": len(results),
         "concurrency": args.concurrency,
         "max_attempts": args.max_attempts,
-        "params": asdict(params),  # temperature, top_p, top_k, repetition_penalty, max_tokens
+        "params": asdict(params),  # sampling knobs plus extra request fields such as json mode
         "elapsed_sec": elapsed,
         "input_tokens": sum(r.prompt_tokens for r in results),
         "output_tokens": sum(r.completion_tokens for r in results),

@@ -87,7 +87,7 @@ def validate_card(raw: str, product_id: str) -> list[Violation]:
         errors.append(
             Violation(
                 "product_id_mismatch",
-                f"{PRODUCT_ID} mismatch: in prompt - {product_id} vs received - {received_prod_id}"
+                f"{PRODUCT_ID} must be exactly \"{product_id}\" as given in the input (got \"{received_prod_id}\")"
             )
         )
 
@@ -99,20 +99,36 @@ def validate_card(raw: str, product_id: str) -> list[Violation]:
         errors.append(Violation("description_type", f"{DESCRIPTION} is not of type str"))
     else:
         description_len = len(description)
-        if 120 > description_len or description_len > 700:
+        # Details are read by a small model on retry: say what to do, not only what is wrong
+        if description_len < 120:
             errors.append(
                 Violation(
                     "description_length",
-                    f"{DESCRIPTION} length {description_len} is beyond the interval [120, 700]"
+                    f"{DESCRIPTION} is too short ({description_len} chars): write 3-4 full sentences, "
+                    f"about 300 chars, mention the key features and what buyers say"
+                )
+            )
+        elif description_len > 700:
+            errors.append(
+                Violation(
+                    "description_length",
+                    f"{DESCRIPTION} is too long ({description_len} chars): keep it within 4-5 sentences, under 700 chars"
                 )
             )
 
         sentence_cnt = count_sentences(description)
-        if 2 > sentence_cnt or sentence_cnt > 5:
+        if sentence_cnt < 2:
             errors.append(
                 Violation(
                     "description_sentences",
-                    f"number of sentences {sentence_cnt} in the description is beyond the interval [2, 5]"
+                    f"{DESCRIPTION} has {sentence_cnt} sentence(s): write 3-4 separate sentences ending with a period"
+                )
+            )
+        elif sentence_cnt > 5:
+            errors.append(
+                Violation(
+                    "description_sentences",
+                    f"{DESCRIPTION} has {sentence_cnt} sentences: merge them into at most 5"
                 )
             )
 

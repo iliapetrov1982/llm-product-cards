@@ -38,7 +38,16 @@ def fit_reviews(product: Product, budget: int = MAX_INPUT_TOKENS) -> list[str]:
         else:
             break
 
+    # The per-review estimate ignores BPE merges across line breaks, so correct it both ways
+    # against the rendered prompt: drop while over budget, then top up while there is room.
     while reviews and count_prompt_tokens(build_messages(product, reviews)) > budget:
         reviews.pop()
+
+    all_reviews = product["reviews"]
+    while len(reviews) < len(all_reviews):
+        candidate = reviews + [all_reviews[len(reviews)]]
+        if count_prompt_tokens(build_messages(product, candidate)) > budget:
+            break
+        reviews = candidate
 
     return reviews
