@@ -27,7 +27,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s",
     force=True,
 )
-logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpx2").setLevel(logging.WARNING)
 logging.getLogger("huggingface_hub").setLevel(logging.WARNING)
 
 # Free OpenRouter models come and go; override with --model when this one is gone
